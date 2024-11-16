@@ -8,12 +8,18 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.devkt.mynotes.data.UserData
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class RegisterActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: FirebaseDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -23,6 +29,10 @@ class RegisterActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance()
+
         val owner = findViewById<TextView>(R.id.owner)
         val startText = findViewById<TextView>(R.id.textView)
         val nameInput = findViewById<TextView>(R.id.nameInput)
@@ -36,11 +46,19 @@ class RegisterActivity : AppCompatActivity() {
         val ownerText = owner.text.toString()
         startTypingAnimation(startText, fullText) {
             showFieldsSequentially(
-                listOf(nameInput, emailInput, passwordInput, registerButton, text1, loginText, owner),
+                listOf(
+                    nameInput,
+                    emailInput,
+                    passwordInput,
+                    registerButton,
+                    text1,
+                    loginText,
+                    owner
+                ),
                 250
             )
             Handler().postDelayed({
-                startTypingAnimation(owner, ownerText){}
+                startTypingAnimation(owner, ownerText) {}
             }, 1450)
         }
 
@@ -51,26 +69,59 @@ class RegisterActivity : AppCompatActivity() {
                     triggerShakeAnimation(emailInput)
                     triggerShakeAnimation(passwordInput)
                 }
+
                 nameInput.text.isEmpty() && emailInput.text.isEmpty() -> {
                     triggerShakeAnimation(nameInput)
                     triggerShakeAnimation(emailInput)
                 }
+
                 nameInput.text.isEmpty() && passwordInput.text.isEmpty() -> {
                     triggerShakeAnimation(nameInput)
                     triggerShakeAnimation(passwordInput)
                 }
+
                 emailInput.text.isEmpty() && passwordInput.text.isEmpty() -> {
                     triggerShakeAnimation(emailInput)
                     triggerShakeAnimation(passwordInput)
                 }
+
                 nameInput.text.isEmpty() -> triggerShakeAnimation(nameInput)
                 emailInput.text.isEmpty() -> triggerShakeAnimation(emailInput)
                 passwordInput.text.isEmpty() -> triggerShakeAnimation(passwordInput)
                 else -> {
-                    val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
-                    intent.putExtra("register", "register")
-                    startActivity(intent)
-                    finish()
+                    val registerName = nameInput.text.toString()
+                    val registerEmail = emailInput.text.toString()
+                    val registerPassword = passwordInput.text.toString()
+                    auth.createUserWithEmailAndPassword(registerEmail, registerPassword)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val user = auth.currentUser
+                                auth.signOut()
+                                user?.let {
+                                    val userReference = database.getReference("users")
+                                    val userId = user.uid
+                                    val userData = UserData(
+                                        registerName,
+                                        registerEmail
+                                    )
+                                    userReference.child(userId).setValue(userData)
+                                }
+                                val intent =
+                                    Intent(this@RegisterActivity, LoginActivity::class.java)
+                                intent.putExtra("register", "register")
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                triggerShakeAnimation(nameInput)
+                                triggerShakeAnimation(emailInput)
+                                triggerShakeAnimation(passwordInput)
+                                Toast.makeText(
+                                    this,
+                                    "Enter Details Properly",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                 }
             }
         }
