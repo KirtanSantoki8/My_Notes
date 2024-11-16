@@ -98,6 +98,15 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        val currentUser = auth.currentUser
+        if(currentUser != null){
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
+    }
+
     private fun startTypingAnimation(textView: TextView, fullText: String, onComplete: () -> Unit) {
         val handler = Handler(Looper.getMainLooper())
         var currentIndex = 0
