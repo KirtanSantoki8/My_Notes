@@ -165,11 +165,9 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
         }
-
         handler.post(showRunnable)
     }
 
-    // Shake Animation for Invalid Inputs
     private fun triggerShakeAnimation(view: View) {
         val pvhX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, 0f, 25f, -25f, 25f, 0f)
         val shakeAnimator = ObjectAnimator.ofPropertyValuesHolder(view, pvhX)
