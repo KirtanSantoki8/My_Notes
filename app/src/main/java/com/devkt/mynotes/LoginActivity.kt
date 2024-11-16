@@ -11,12 +11,15 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -26,6 +29,9 @@ class LoginActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        auth = FirebaseAuth.getInstance()
+
         val welcomeText = findViewById<TextView>(R.id.animated_text)
         val loginButton = findViewById<Button>(R.id.loginButton)
         val emailInput = findViewById<EditText>(R.id.emailInput)
@@ -63,9 +69,24 @@ class LoginActivity : AppCompatActivity() {
                 emailInput.text.isEmpty() -> triggerShakeAnimation(emailInput)
                 passwordInput.text.isEmpty() -> triggerShakeAnimation(passwordInput)
                 else -> {
-                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    val loginEmail = emailInput.text.toString()
+                    val loginPassword = passwordInput.text.toString()
+                    auth.signInWithEmailAndPassword(loginEmail, loginPassword)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                triggerShakeAnimation(emailInput)
+                                triggerShakeAnimation(passwordInput)
+                                Toast.makeText(
+                                    this,
+                                    "Please Enter Correct Details.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                 }
             }
         }
@@ -113,7 +134,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showFields(views: List<View>) {
         var currentIndex = 0
-        for(currentView in views){
+        for (currentView in views) {
             if (currentIndex < views.size) {
                 views[currentIndex].visibility = View.VISIBLE
                 currentIndex++
