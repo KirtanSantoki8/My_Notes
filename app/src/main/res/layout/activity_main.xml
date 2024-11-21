@@ -28,6 +28,8 @@
         android:layout_marginStart="7dp"
         android:text="Logout"
         android:textColor="@color/white"
+        android:textSize="17sp"
+        android:backgroundTint="@color/logout"
         app:layout_constraintBottom_toBottomOf="@id/headingText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/headingText"
