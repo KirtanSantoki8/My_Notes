@@ -45,11 +45,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
+    <com.google.android.material.textfield.TextInputEditText
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/heading"
-        android:text="Heading Text"
+        android:hint="Heading Text"
+        android:textColorHint="@color/font_color"
         android:textSize="30sp"
         android:textStyle="bold"
         android:textColor="@color/font_color"
@@ -72,7 +73,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/heading"/>
 
-    <TextView
+    <com.google.android.material.textfield.TextInputEditText
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/description"
@@ -81,6 +82,7 @@
         android:textSize="20sp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
+        android:gravity="top"
         app:layout_constraintStart_toStartOf="@id/divider"
         app:layout_constraintEnd_toEndOf="@id/divider"
         app:layout_constraintTop_toBottomOf="@id/divider"
