@@ -5,4 +5,5 @@
     <color name="register">#0C3457</color>
     <color name="black">#FF000000</color>
     <color name="logout">#E20031</color>
+    <color name="green">#00FF00</color>
 </resources>
